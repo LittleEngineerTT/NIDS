@@ -6,5 +6,8 @@ To do it, we leverage on scapy a python library and 3 honeypot each is specializ
 ### SYN scan attack
 First of all we need a target so we used PortScanHoneypot as SYN scan honeypot.
 - Go to the (https://github.com/DanaEpp/PortScanHoneypot) and follow the installation guide.
-- Configure the honeypot in /etc/pshp.conf
-- Execute the attacker script and see SYN scan logs on monitored ports.
+- Go inside ./syn_scan/ dir
+- Configure the honeypot in ./pshp.conf
+- Install dependencies `pip3 install -r requirements.txt`
+- Run the honeypot using `sudo python3 portscanhoneypot.py -c pshp.conf`
+- Execute the attacker script and see SYN scan logs appear on monitored ports.
