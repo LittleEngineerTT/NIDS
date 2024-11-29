@@ -24,15 +24,18 @@ def scan_port(ip: str, port: int, delay:int = 0):
 
     time.sleep(delay)
 
-
+def show_help():
+    print("Usage: python script.py <ip> <ports> <scan_type>")
+    print("ARGUMENTS:\n"
+          "\tscan_type:\n" +
+          "\t\tsimple: scan to a single port\n" +
+          "\t\tsev_unmon: scan multiple port once\n\n")
+    print("\tports: list of ports to scan. Examples 1,2-10,11 OR 22")
 
 if __name__ == "__main__":
 
-    if len(sys.argv) != 3 and len(sys.argv) != 4:
-        print("Usage: python script.py <ip> <ports> <scan_type>")
-        print("scan_type:\n" +
-                "simple\n" +
-                "sev_unmon\n")
+    if len(sys.argv) != 3 and len(sys.argv) != 4 or "--help" in sys.argv or "-h" in sys.argv:
+        show_help()
         sys.exit(1)
 
     target_ip = sys.argv[1]
