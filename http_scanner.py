@@ -31,7 +31,8 @@ if __name__ == "__main__":
     if len(sys.argv) != 3 and len(sys.argv) != 4:
         print("Usage: python script.py <ip> <ports> <scan_type>")
         print("scan_type:\n" +
-                "simple\n")
+                "simple\n" +
+                "sev_unmon\n")
         sys.exit(1)
 
     target_ip = sys.argv[1]
@@ -43,3 +44,6 @@ if __name__ == "__main__":
 
     if scan_type == "simple":
         scan_port(target_ip, int(target_port))
+    elif scan_type == "sev_unmon":
+        for port in ["21", "22", "23","24"]:
+            scan_port(target_ip, int(port))
