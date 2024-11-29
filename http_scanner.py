@@ -1,28 +1,25 @@
-import socket
-import time
+from scapy.all import *
 import sys
+import time
 
 
-def scan_port(ip: str, port: int, delay:int = 0):
-    try:
-        # socket creation
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.settimeout(1)
+def scan_port(ip, port, timeout=1):
+    state = "closed"
 
-        # Connection
-        result = sock.connect_ex((ip, port))
+    # Syn packet
+    p = IP(dst=ip)/TCP(dport=port, flags='S')
+    answers, un_answered = sr(p, timeout=0.2, verbose=False)  # Send the packets
+    for req, resp in answers:
+        if not resp.haslayer(TCP):
+            continue
+        tcp_layer = resp.getlayer(TCP)
+        if tcp_layer.flags == 0x12:
+            state = "open"
 
-        if result == 0:
-            print(f"The {port} is open")
-        else:
-            print(f"The {port} is closed")
+    print(f"{port} is {state}")
+    time.sleep(timeout)
+    return
 
-    except socket.error:
-        print(f"Socket connection error")
-    finally:
-        sock.close()
-
-    time.sleep(delay)
 
 def show_help():
     print("Usage: python script.py <ip> <ports> <scan_type>\n")
@@ -63,13 +60,15 @@ if __name__ == "__main__":
             show_help()
             sys.exit(1)
         scan_port(target_ip, int(target_port))
+
     elif scan_type == "sev_unmon":
         for port in target_port:
             scan_port(target_ip, int(port))
+
     elif scan_type == "sev_unmon_delay":
         for port in target_port:
             scan_port(target_ip, int(port), 0.5)
+
     elif scan_type == "sev_unmon_bigdelay":
         for port in target_port:
             scan_port(target_ip, int(port), 3)
-    #elif scan_type == "sev_unmon_bigdelay":
