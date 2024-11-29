@@ -55,6 +55,10 @@ if __name__ == "__main__":
     print(f"Syn scan to {target_ip} on {target_port} port")
 
     if scan_type == "simple":
+        if len(target_port) != 1:
+            print("You should use a single port")
+            show_help()
+            sys.exit(1)
         scan_port(target_ip, int(target_port))
     elif scan_type == "sev_unmon":
         for port in target_port:
