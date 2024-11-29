@@ -25,11 +25,11 @@ def scan_port(ip: str, port: int, delay:int = 0):
     time.sleep(delay)
 
 def show_help():
-    print("Usage: python script.py <ip> <ports> <scan_type>")
+    print("Usage: python script.py <ip> <ports> <scan_type>\n")
     print("ARGUMENTS:\n"
           "\tscan_type:\n" +
           "\t\tsimple: scan to a single port\n" +
-          "\t\tsev_unmon: scan multiple port once\n\n")
+          "\t\tsev_unmon: scan multiple port once\n")
     print("\tports: list of ports to scan. Examples 1,2-10,11 OR 22")
 
 if __name__ == "__main__":
