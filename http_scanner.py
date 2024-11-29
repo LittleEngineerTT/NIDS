@@ -42,11 +42,20 @@ if __name__ == "__main__":
     tmp_target_port = sys.argv[2]
     target_port = []
     scan_type = sys.argv[3] if len(sys.argv) == 4 else "simple"
+    tmp_target_port = tmp_target_port.split(",")
+    for elem in tmp_target_port:
+        if '-' in elem:
+            elem = elem.split('-')
+            if len(elem) == 2:
+                interval = [str(i) for i in range(int(elem[0]), int(elem[1]) + 1)]
+                target_port += interval
+        else:
+            target_port.append(elem)
 
     print(f"Syn scan to {target_ip} on {target_port} port")
 
     if scan_type == "simple":
         scan_port(target_ip, int(target_port))
     elif scan_type == "sev_unmon":
-        for port in ["21", "22", "23","24"]:
+        for port in target_port:
             scan_port(target_ip, int(port))
