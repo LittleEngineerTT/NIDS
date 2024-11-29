@@ -29,7 +29,10 @@ def show_help():
     print("ARGUMENTS:\n"
           "\tscan_type:\n" +
           "\t\tsimple: scan to a single port\n" +
-          "\t\tsev_unmon: scan multiple port once\n")
+          "\t\tsev_unmon: scan multiple ports once\n" +
+          "\t\tsev_unmon_delay: sev_unmon using 0.5 seconds as delay\n" +
+          "\t\tsev_unmon_bigdelay: sev_unmon using 3 seconds as delay\n"
+          )
     print("\tports: list of ports to scan. Examples 1,2-10,11 OR 22")
 
 if __name__ == "__main__":
@@ -63,3 +66,10 @@ if __name__ == "__main__":
     elif scan_type == "sev_unmon":
         for port in target_port:
             scan_port(target_ip, int(port))
+    elif scan_type == "sev_unmon_delay":
+        for port in target_port:
+            scan_port(target_ip, int(port), 0.5)
+    elif scan_type == "sev_unmon_bigdelay":
+        for port in target_port:
+            scan_port(target_ip, int(port), 3)
+    #elif scan_type == "sev_unmon_bigdelay":
