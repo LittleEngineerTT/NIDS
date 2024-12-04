@@ -22,7 +22,7 @@ def scan_port(ip, port, timeout=1):
 
 
 def show_help():
-    print("Usage: python script.py <ip> <ports> <scan_type>\n")
+    print("Usage: python syn_scan.py <ip> <ports> <scan_type>\n")
     print("ARGUMENTS:\n"
           "\tscan_type:\n" +
           "\t\tsimple: scan to a single port\n" +
@@ -59,7 +59,7 @@ if __name__ == "__main__":
             print("You should use a single port")
             show_help()
             sys.exit(1)
-        scan_port(target_ip, int(target_port))
+        scan_port(target_ip, int(target_port[0]))
 
     elif scan_type == "sev_unmon":
         for port in target_port:
