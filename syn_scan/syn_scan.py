@@ -3,11 +3,14 @@ import sys
 import time
 
 
-def scan_port(ip, port, timeout=1):
+def scan_port(ip, port, timeout=1, src_ip=None):
     state = "closed"
 
     # Syn packet
-    p = IP(dst=ip)/TCP(dport=port, flags='S')
+    if src_ip:
+        p = IP(src=src_ip ,dst=ip)/TCP(dport=port, flags='S')
+    else:
+        p = IP(dst=ip)/TCP(dport=port, flags='S')
     answers, un_answered = sr(p, timeout=0.2, verbose=False)  # Send the packets
     for req, resp in answers:
         if not resp.haslayer(TCP):
@@ -69,3 +72,8 @@ if __name__ == "__main__":
     elif scan_type == "several":
         for port in target_port:
             scan_port(target_ip, int(port), 3)
+
+    elif scan_type == "same_network":
+        ip_list = create_ip_list(len(target_port))
+        for i in range(len(target_port)):
+            scan_port(target_ip, int(target_port[i]), 0, src_ip=ip_list[i])
