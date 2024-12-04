@@ -77,3 +77,6 @@ if __name__ == "__main__":
         ip_list = create_ip_list(len(target_port))
         for i in range(len(target_port)):
             scan_port(target_ip, int(target_port[i]), 0, src_ip=ip_list[i])
+    else:
+        print("Error: Invalid scan type")
+        show_help()
