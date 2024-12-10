@@ -38,12 +38,10 @@ def log_syn_packet(packet):
                 state[src] = set()
             state[src].add(tcp_layer.dport)
             network = get_network_from_ip(src)
-            print(network)
 
             to_log = to_block(src, network)
             if to_log >= 0:
                 write_log(to_log, src, network,)
-    print(network_state)
 
 
 def to_block(src, network):
