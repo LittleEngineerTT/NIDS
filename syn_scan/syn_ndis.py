@@ -4,6 +4,7 @@ from scapy.layers.l2 import Ether
 import threading
 import ipaddress
 
+
 state = {}
 network_state = {}
 mac_state = {}
@@ -40,13 +41,27 @@ def log_syn_packet(packet):
             state[src].add(tcp_layer.dport)
             network = get_network_from_ip(src)
             print(network)
-            to_log = to_block(src, network)
+
+            src_mac = None
+            if packet.haslayer(Ether):
+                # Extract the Ethernet layer
+                eth_layer = packet.getlayer(Ether)
+                src_mac = str(eth_layer.src)
+                if src_mac != "00:00:00:00:00:00":
+                    if src_mac not in mac_state.keys():
+                        mac_state[src_mac] = set()
+                    mac_state[src_mac].add(tcp_layer.dport)
+            to_log = to_block(src, network, src_mac)
             if to_log >= 0:
-                write_log(to_log, src, network)
+                write_log(to_log, src, network, src_mac)
     print(network_state)
 
-def to_block(src, network):
-    global state, network_state
+
+def to_block(src, network, src_mac):
+    global state, network_state, mac_state
+
+    if src_mac in mac_state.keys():
+        return 3 if len(mac_state[src_mac]) >= 3 else -1
 
     # Check for a network scan
     if network is not None:
@@ -63,25 +78,31 @@ def to_block(src, network):
         return -1
 
 
-def write_log(to_log, src, network):
+def write_log(to_log, src, network, src_mac):
     with open("log.txt", "a") as log_file:
         if to_log == 1:
-            log_file.write(f"SYN Packet: {src} -> {get_ports(0, src)}\n")
-            print(f"SYN Packet: {src} -> {get_ports(0, src)}")
-        else:
+            log_file.write(f"SYN Scan: {src} -> {get_ports(0, src)}\n")
+            print(f"SYN Scan: {src} -> {get_ports(0, src)}")
+        elif to_log == 2:
             log_file.write(f"SYN Scan: {network} -> {get_ports(1, network)}\n")
             print(f"SYN Scan: {network} -> {get_ports(1, network)}")
+        else:
+            if src_mac is not None:
+                log_file.write(f"SYN Scan: {src_mac} -> {get_ports(2, src_mac)}\n")
+                print(f"SYN Scan: {src_mac} -> {get_ports(2, src_mac)}")
 
 
 def get_ports(content_type, content):
-    global state, network_state
+    global state, network_state, mac_state
     if content_type == 0:
         return list(state[content])
-    else:
+    elif content_type == 1:
         ports = []
         for ip_src in network_state[content]:
             ports.append(get_ports(0, ip_src))
         return ports
+    else:
+        return list(mac_state[content])
 
 
 if __name__ == '__main__':
