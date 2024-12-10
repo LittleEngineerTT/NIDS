@@ -1,5 +1,6 @@
 from scapy.all import sniff
 from scapy.layers.inet import IP, TCP
+from datetime import datetime
 import threading
 import ipaddress
 
@@ -40,7 +41,7 @@ def log_syn_packet(packet):
 
             to_log = to_block(src, network)
             if to_log >= 0:
-                write_log(to_log, src, network,)
+                write_log(to_log, src, network, tcp_layer.dport)
 
 
 def to_block(src, network):
@@ -61,14 +62,15 @@ def to_block(src, network):
         return -1
 
 
-def write_log(to_log, src, network):
+def write_log(to_log, src, network, port):
+    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     with open("log.txt", "a") as log_file:
         if to_log == 1:
-            log_file.write(f"SYN Scan: {src} -> {get_ports(0, src)}\n")
-            print(f"SYN Scan: {src} -> {get_ports(0, src)}")
+            log_file.write(f"{timestamp} SYN Scan: {src} -> {port}\n")
+            print(f"{timestamp} SYN Scan: {src} -> {port}")
         elif to_log == 2:
-            log_file.write(f"SYN Scan: {network} -> {get_ports(1, network)}\n")
-            print(f"SYN Scan: {network} -> {get_ports(1, network)}")
+            log_file.write(f"{timestamp} SYN Scan: {network} -> {port}\n")
+            print(f"{timestamp} SYN Scan: {network} -> {port}")
 
 
 def get_ports(content_type, content):
