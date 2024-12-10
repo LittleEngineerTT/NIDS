@@ -3,6 +3,12 @@ from scapy.layers.inet import IP, TCP
 from datetime import datetime
 import threading
 import ipaddress
+import atexit
+import yaml
+import os
+from cryptography.hazmat.primitives import serialization
+from nacl.signing import SigningKey
+import base64
 
 
 state = {}
@@ -84,6 +90,41 @@ def get_ports(content_type, content):
         return ports
 
 
+def sign_message(message: str, private_key_hex: str) -> str:
+    try:
+        signing_key = SigningKey(bytes.fromhex(private_key_hex))
+        # Signing
+        signed = signing_key.sign(message.encode())
+        return base64.b64encode(signed).decode()
+    except Exception as e:
+        raise Exception(f"Erreur de signature: {str(e)}")
+
+
+def save_to_file():
+    if not os.path.exists("./config.yaml"):
+        print("Error: ./config.yaml missing")
+        return
+    with open("./config.yaml", "r") as config_file:
+        configuration = yaml.safe_load(config_file)
+
+    print("Sending log file...")
+    log_path = './log.txt'
+
+    if not os.path.exists(configuration['encryption_key']):
+        print("Error: certificate file not found please verify ./config.yaml")
+        return
+
+    with open(log_path, "r") as log_file:
+        log_data = log_file.read()
+
+    with open(configuration['encryption_key'], "rb") as private_key_file:
+        private_key = serialization.load_pem_private_key(private_key_file.read(), None)
+        signature = private_key.sign(log_data.encode())
+
+    return base64.b64encode(signature).decode()
+
+
 if __name__ == '__main__':
+    atexit.register(save_to_file)
     clear_state()
     sniff(filter="tcp", iface="lo", prn=log_syn_packet, store=0)
