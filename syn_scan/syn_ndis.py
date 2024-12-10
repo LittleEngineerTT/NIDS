@@ -1,18 +1,21 @@
 from scapy.all import sniff
 from scapy.layers.inet import IP, TCP
 import threading
+import ipaddress
 
 state = {}
+network_state = {}
 
 def clear_state():
-    global state
+    global state, network_state
     state.clear()  # Clear the data state
+    network_state.clear()
     # schedule the task to run every minutes
     threading.Timer(60, clear_state).start()
 
 
 def log_syn_packet(packet):
-    global state
+    global state, network_state
     # Is tcp
     if packet.haslayer(IP) and packet.haslayer(TCP):
         ip_layer = packet.getlayer(IP)
