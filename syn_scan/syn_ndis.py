@@ -80,7 +80,7 @@ def get_ports(content_type, content):
     else:
         ports = []
         for ip_src in network_state[content]:
-            ports.append(get_ports(0, ip_src))
+            ports += get_ports(0, ip_src)
         return ports
 
 
