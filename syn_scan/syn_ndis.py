@@ -1,6 +1,5 @@
 from scapy.all import sniff
 from scapy.layers.inet import IP, TCP
-from scapy.layers.l2 import Ether
 import threading
 import ipaddress
 
