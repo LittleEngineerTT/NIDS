@@ -1,3 +1,4 @@
+import argparse
 import subprocess
 
 from scapy.all import sniff
@@ -15,6 +16,9 @@ from cryptography.fernet import Fernet
 state = {}
 network_state = {}
 save_state = set()
+parser = argparse.ArgumentParser(description='NIDS')
+parser.add_argument( '--email', required=True, help='Email address to send the report')
+email = parser.parse_args().email
 
 def clear_state():
     global state, network_state
