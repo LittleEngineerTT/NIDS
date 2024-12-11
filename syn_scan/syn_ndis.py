@@ -6,12 +6,11 @@ from datetime import datetime
 import threading
 import ipaddress
 import atexit
-import yaml
-import os
-from cryptography.hazmat.primitives import serialization
 from nacl.signing import SigningKey
 import base64
-
+import smtplib
+from email.mime.text import MIMEText
+from cryptography.fernet import Fernet
 
 state = {}
 network_state = {}
@@ -104,28 +103,42 @@ def sign_message(message: str, private_key_hex: str) -> str:
         raise Exception(f"Erreur de signature: {str(e)}")
 
 
-def save_to_file():
-    if not os.path.exists("./config.yaml"):
-        print("Error: ./config.yaml missing")
-        return
-    with open("./config.yaml", "r") as config_file:
-        configuration = yaml.safe_load(config_file)
-
-    print("Sending log file...")
+def encrypt_log():
     log_path = './log.txt'
 
-    if not os.path.exists(configuration['encryption_key']):
-        print("Error: certificate file not found please verify ./config.yaml")
-        return
+    # Create new key
+    key = Fernet.generate_key()
+    # store key
+    with open('filekey.key', 'wb') as filekey:
+        filekey.write(key)
+    with open('filekey.key', 'rb') as filekey:
+        key = filekey.read()
 
-    with open(log_path, "r") as log_file:
-        log_data = log_file.read()
+    fernet = Fernet(key)
 
-    with open(configuration['encryption_key'], "rb") as private_key_file:
-        private_key = serialization.load_pem_private_key(private_key_file.read(), None)
-        signature = private_key.sign(log_data.encode())
+    with open(log_path, 'rb') as file:
+        log_data = file.read()
+    encrypted = fernet.encrypt(log_data)
+    return encrypted
 
-    return base64.b64encode(signature).decode()
+
+def send_log():
+    global email
+    encrypted_log = encrypt_log().decode("utf-8")
+
+    print("Sending log file...")
+
+    GMAIL_USERNAME = "epitanidsprojecteventsummary"
+    GMAIL_APP_PASSWORD = "rvmjahmhwhjntdkr"
+    recipients = [email]
+    msg = MIMEText(encrypted_log)
+    msg["Subject"] = "NIDS report"
+    msg["To"] = ", ".join(recipients)
+    msg["From"] = f"{GMAIL_USERNAME}@gmail.com"
+    smtp_server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+    smtp_server.login(GMAIL_USERNAME, GMAIL_APP_PASSWORD)
+    smtp_server.sendmail(msg["From"], recipients, msg.as_string())
+    smtp_server.quit()
 
 
 def block_ip(ip_src, type):
@@ -192,6 +205,6 @@ def block_ip(ip_src, type):
 
 
 if __name__ == '__main__':
-    atexit.register(save_to_file)
+    atexit.register(send_log)
     clear_state()
     sniff(filter="tcp", iface="lo", prn=log_syn_packet, store=0)
