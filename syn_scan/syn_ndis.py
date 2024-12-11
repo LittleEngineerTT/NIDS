@@ -13,6 +13,7 @@ import base64
 
 state = {}
 network_state = {}
+save_state = set()
 
 def clear_state():
     global state, network_state
@@ -47,6 +48,7 @@ def log_syn_packet(packet):
 
             to_log = to_block(src, network)
             if to_log >= 0:
+                block_ip(src, to_log)
                 write_log(to_log, src, network, tcp_layer.dport)
 
 
@@ -122,6 +124,26 @@ def save_to_file():
         signature = private_key.sign(log_data.encode())
 
     return base64.b64encode(signature).decode()
+
+
+def block_ip(ip_src, type):
+    global save_state
+    if type == 2:
+        network = '.'.join(ip_src.split('.')[:-1]) + ".0/24"
+        print(network)
+        if network not in save_state:
+            save_state.add(network)
+            print(f"Blocking {'.'.join(ip_src.split('.')[:-1])}.0/24...")
+            for i in range(255):
+                ip = f"{'.'.join(ip_src.split('.')[:-1])}.{i}"
+                os.system(f"sudo iptables -A INPUT -s {ip} -j DROP")
+                os.system(f'echo "iptables -D INPUT -s {ip} -j DROP" | sudo at now + 1 hour')
+    else:
+        if ip_src not in save_state:
+            save_state.add(ip_src)
+            print(f"Blocking {ip_src}...")
+            os.system(f"sudo iptables -A INPUT -s {ip_src} -j DROP")
+            os.system(f'echo "iptables -D INPUT -s {ip_src} -j DROP" | sudo at now + 1 hour')
 
 
 if __name__ == '__main__':
