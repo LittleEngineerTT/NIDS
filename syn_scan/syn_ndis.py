@@ -134,7 +134,7 @@ def block_ip(ip_src, type):
         if network not in save_state:
             save_state.add(network)
             print(f"Blocking {'.'.join(ip_src.split('.')[:-1])}.0/24...")
-            for i in range(255):
+            for i in range(1,255):
                 ip = f"{'.'.join(ip_src.split('.')[:-1])}.{i}"
                 os.system(f"sudo iptables -A INPUT -s {ip} -j DROP")
                 os.system(f'echo "iptables -D INPUT -s {ip} -j DROP" | sudo at now + 1 hour')
