@@ -153,15 +153,13 @@ def block_ip(ip_src, type):
                     ['sudo', 'at', f'now + {1} minute'],
                     input=unblock_out_cmd.encode(),
                     stdout=subprocess.DEVNULL,
-                    stderr=subprocess.DEVNULL,
-                    shell=True
+                    stderr=subprocess.DEVNULL
                 )
                 subprocess.run(
                     ['sudo', 'at', f'now + {1} minute'],
                     input=unblock_cmd.encode(),
                     stdout=subprocess.DEVNULL,
                     stderr=subprocess.DEVNULL,
-                    shell=True
                 )
     else:
         if ip_src not in save_state:
@@ -183,15 +181,13 @@ def block_ip(ip_src, type):
                 ['sudo', 'at', f'now + {1} minute'],
                 input=unblock_cmd.encode(),
                 stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
-                shell=True
+                stderr=subprocess.DEVNULL
             )
             subprocess.run(
                 ['sudo', 'at', f'now + {1} minute'],
                 input=unblock_out_cmd.encode(),
                 stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
-                shell=True
+                stderr=subprocess.DEVNULL
             )
 
 
