@@ -1,3 +1,5 @@
+import subprocess
+
 from scapy.all import sniff
 from scapy.layers.inet import IP, TCP
 from datetime import datetime
@@ -130,20 +132,67 @@ def block_ip(ip_src, type):
     global save_state
     if type == 2:
         network = '.'.join(ip_src.split('.')[:-1]) + ".0/24"
-        print(network)
         if network not in save_state:
             save_state.add(network)
             print(f"Blocking {'.'.join(ip_src.split('.')[:-1])}.0/24...")
             for i in range(1,255):
                 ip = f"{'.'.join(ip_src.split('.')[:-1])}.{i}"
-                os.system(f"sudo iptables -A INPUT -s {ip} -j DROP")
-                os.system(f'echo "iptables -D INPUT -s {ip} -j DROP" | sudo at now + 1 hour')
+                subprocess.run(
+                    ['sudo', 'iptables', '-A', 'INPUT', '-s', ip, '-j', 'DROP'],
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL
+                )
+                subprocess.run(
+                    ['sudo', 'iptables', '-A', 'OUTPUT', '-d', ip, '-j', 'DROP'],
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL
+                )
+                unblock_cmd = f"iptables -D INPUT -s {ip} -j DROP"
+                unblock_out_cmd = f"iptables -D OUTPUT -d {ip} -j DROP"
+                subprocess.run(
+                    ['sudo', 'at', f'now + {1} minute'],
+                    input=unblock_out_cmd.encode(),
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL,
+                    shell=True
+                )
+                subprocess.run(
+                    ['sudo', 'at', f'now + {1} minute'],
+                    input=unblock_cmd.encode(),
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL,
+                    shell=True
+                )
     else:
         if ip_src not in save_state:
             save_state.add(ip_src)
             print(f"Blocking {ip_src}...")
-            os.system(f"sudo iptables -A INPUT -s {ip_src} -j DROP")
-            os.system(f'echo "iptables -D INPUT -s {ip_src} -j DROP" | sudo at now + 1 hour')
+            subprocess.run(
+                ['sudo', 'iptables', '-A', 'INPUT', '-s', ip_src, '-j', 'DROP'],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL
+            )
+            subprocess.run(
+                ['sudo', 'iptables', '-A', 'OUTPUT', '-d', ip_src, '-j', 'DROP'],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL
+            )
+            unblock_cmd = f"iptables -D INPUT -s {ip_src} -j DROP"
+            unblock_out_cmd = f"iptables -D OUTPUT -d {ip_src} -j DROP"
+            subprocess.run(
+                ['sudo', 'at', f'now + {1} minute'],
+                input=unblock_cmd.encode(),
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                shell=True
+            )
+            subprocess.run(
+                ['sudo', 'at', f'now + {1} minute'],
+                input=unblock_out_cmd.encode(),
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                shell=True
+            )
 
 
 if __name__ == '__main__':
