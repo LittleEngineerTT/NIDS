@@ -167,13 +167,13 @@ def block_ip(ip_src, type):
                 unblock_cmd = f"iptables -D INPUT -s {ip} -j DROP"
                 unblock_out_cmd = f"iptables -D OUTPUT -d {ip} -j DROP"
                 subprocess.run(
-                    ['sudo', 'at', f'now + {1} minute'],
+                    ['sudo', 'at', f'now + {1} hour'],
                     input=unblock_out_cmd.encode(),
                     stdout=subprocess.DEVNULL,
                     stderr=subprocess.DEVNULL
                 )
                 subprocess.run(
-                    ['sudo', 'at', f'now + {1} minute'],
+                    ['sudo', 'at', f'now + {1} hour'],
                     input=unblock_cmd.encode(),
                     stdout=subprocess.DEVNULL,
                     stderr=subprocess.DEVNULL,
@@ -195,13 +195,13 @@ def block_ip(ip_src, type):
             unblock_cmd = f"iptables -D INPUT -s {ip_src} -j DROP"
             unblock_out_cmd = f"iptables -D OUTPUT -d {ip_src} -j DROP"
             subprocess.run(
-                ['sudo', 'at', f'now + {1} minute'],
+                ['sudo', 'at', f'now + {1} hour'],
                 input=unblock_cmd.encode(),
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL
             )
             subprocess.run(
-                ['sudo', 'at', f'now + {1} minute'],
+                ['sudo', 'at', f'now + {1} hour'],
                 input=unblock_out_cmd.encode(),
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL
