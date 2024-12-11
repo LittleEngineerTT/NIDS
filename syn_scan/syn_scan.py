@@ -26,8 +26,8 @@ def scan_port(ip, port, timeout=1, src_ip=None):
 
 def create_ip_list(number):
     ip_list = []
-    for i in range(number):
-        ip_list.append("192.168.0." + str(i + 1))
+    for i in range(1, number):
+        ip_list.append("127.0.1." + str(i%254))
     return ip_list
 
 
@@ -67,11 +67,11 @@ if __name__ == "__main__":
             print("You should use a single port")
             show_help()
             sys.exit(1)
-        scan_port(target_ip, int(target_port[0]))
+        scan_port(target_ip, int(target_port[0]), src_ip="127.0.1.3")
 
     elif scan_type == "several":
         for port in target_port:
-            scan_port(target_ip, int(port), 3)
+            scan_port(target_ip, int(port), 3, src_ip="127.0.1.2")
 
     elif scan_type == "same_network":
         ip_list = create_ip_list(len(target_port))
