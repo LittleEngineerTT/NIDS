@@ -3,11 +3,14 @@ import sys
 import time
 
 
-def scan_port(ip, port, timeout=1):
+def scan_port(ip, port, timeout=1, src_ip=None):
     state = "closed"
 
     # Syn packet
-    p = IP(dst=ip)/TCP(dport=port, flags='S')
+    if src_ip:
+        p = IP(src=src_ip ,dst=ip)/TCP(dport=port, flags='S')
+    else:
+        p = IP(dst=ip)/TCP(dport=port, flags='S')
     answers, un_answered = sr(p, timeout=0.2, verbose=False)  # Send the packets
     for req, resp in answers:
         if not resp.haslayer(TCP):
@@ -21,14 +24,19 @@ def scan_port(ip, port, timeout=1):
     return
 
 
+def create_ip_list(number):
+    ip_list = []
+    for i in range(1, number + 1):
+        ip_list.append("127.0.1." + str(i%254))
+    return ip_list
+
+
 def show_help():
-    print("Usage: python script.py <ip> <ports> <scan_type>\n")
+    print("Usage: python syn_scan.py <ip> <ports> <scan_type>\n")
     print("ARGUMENTS:\n"
           "\tscan_type:\n" +
           "\t\tsimple: scan to a single port\n" +
-          "\t\tsev_unmon: scan multiple ports once\n" +
-          "\t\tsev_unmon_delay: sev_unmon using 0.5 seconds as delay\n" +
-          "\t\tsev_unmon_bigdelay: sev_unmon using 3 seconds as delay\n"
+          "\t\tseveral: scan to multiple ports using 3 seconds as delay\n"
           )
     print("\tports: list of ports to scan. Examples 1,2-10,11 OR 22")
 
@@ -59,16 +67,16 @@ if __name__ == "__main__":
             print("You should use a single port")
             show_help()
             sys.exit(1)
-        scan_port(target_ip, int(target_port))
+        scan_port(target_ip, int(target_port[0]), src_ip="127.0.1.3")
 
-    elif scan_type == "sev_unmon":
+    elif scan_type == "several":
         for port in target_port:
-            scan_port(target_ip, int(port))
+            scan_port(target_ip, int(port), 3, src_ip="127.0.1.2")
 
-    elif scan_type == "sev_unmon_delay":
-        for port in target_port:
-            scan_port(target_ip, int(port), 0.5)
-
-    elif scan_type == "sev_unmon_bigdelay":
-        for port in target_port:
-            scan_port(target_ip, int(port), 3)
+    elif scan_type == "same_network":
+        ip_list = create_ip_list(len(target_port))
+        for i in range(len(target_port)):
+            scan_port(target_ip, int(target_port[i]), 0, src_ip=ip_list[i])
+    else:
+        print("Error: Invalid scan type")
+        show_help()
