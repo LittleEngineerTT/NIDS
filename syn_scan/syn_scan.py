@@ -26,7 +26,7 @@ def scan_port(ip, port, timeout=1, src_ip=None):
 
 def create_ip_list(number):
     ip_list = []
-    for i in range(1, number):
+    for i in range(1, number + 1):
         ip_list.append("127.0.1." + str(i%254))
     return ip_list
 
