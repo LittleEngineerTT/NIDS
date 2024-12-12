@@ -1,0 +1,2 @@
+paramiko==2.9.3
+scapy==2.6.1
