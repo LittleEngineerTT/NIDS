@@ -7,7 +7,7 @@ def global_detect(packet):
     # we redirect packet to every sub-nids and they will treat it as they want
     ssh_nids.detect_bruteforce(packet)
     nids.log_syn_packet(packet)
-    NdisDOS.detect_syn_flood(packet)
+    NidsDOS.detect_syn_flood(packet)
 
 print(f"Started Global NIDS Protection System...")
 # we directly filter by port here!

@@ -1,4 +1,4 @@
-# NdisDOS - SYN FLOOD Detection and Blocking
+# NidsDOS - SYN FLOOD Detection and Blocking
 
 This project provides mechanism for detecting **SYN flood attack and blocling malicious IP**. It also provides the attacker's script.
 
