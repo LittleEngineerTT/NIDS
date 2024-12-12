@@ -57,7 +57,7 @@ def log_syn_packet(packet):
             to_log = to_block(src, network)
             if to_log >= 0:
                 block_ip(src, to_log)
-                write_log(to_log, src, network, tcp_layer.dport)
+                write_log(to_log, src, network, tcp_layer.dport, "SYN Scan")
 
 
 def to_block(src, network):
@@ -78,15 +78,15 @@ def to_block(src, network):
         return -1
 
 
-def write_log(to_log, src, network, port):
+def write_log(to_log, src, network, target, log_type):
     timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     with open("log.txt", "a") as log_file:
         if to_log == 1:
-            log_file.write(f"{timestamp} SYN Scan: {src} -> {port}\n")
-            print(f"{timestamp} SYN Scan: {src} -> {port}")
+            log_file.write(f"{timestamp} {log_type}: {src} -> {target}\n")
+            print(f"{timestamp} {log_type}: {src} -> {target}")
         elif to_log == 2:
-            log_file.write(f"{timestamp} SYN Scan: {network} -> {port}\n")
-            print(f"{timestamp} SYN Scan: {network} -> {port}")
+            log_file.write(f"{timestamp} {log_type}: {network} -> {target}\n")
+            print(f"{timestamp} {log_type}: {network} -> {target}")
 
 
 def get_ports(content_type, content):
