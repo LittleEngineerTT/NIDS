@@ -1,12 +1,12 @@
 import argparse
 import subprocess
+import os
 
 from scapy.all import sniff
 from scapy.layers.inet import IP, TCP
 from datetime import datetime
 import threading
 import ipaddress
-import atexit
 import smtplib
 from email.mime.text import MIMEText
 from cryptography.fernet import Fernet
@@ -18,9 +18,11 @@ parser = argparse.ArgumentParser(description='NIDS')
 parser.add_argument( '-s', '--source_email', required=True, help='Source email address to send the report')
 parser.add_argument('-p', '--password', required=True, help='App password (app password gmail)')
 parser.add_argument('-d', '--dest_email', required=True, help='Destination email address')
+parser.add_argument('-i', '--interval', required=True, help='Time interval to send NIDS report')
 dst_email = parser.parse_args().source_email
 src_mail = parser.parse_args().dest_email
 password = parser.parse_args().password
+interval = parser.parse_args().interval
 
 
 def clear_state():
@@ -120,7 +122,12 @@ def encrypt_log():
 
 
 def send_log():
-    global dst_email, src_mail, password
+    global dst_email, src_mail, password, interval
+
+    threading.Timer(int(interval), send_log).start()
+    if not os.path.exists("log.txt"):
+        return
+
     encrypted_log = encrypt_log().decode("utf-8")
 
     print("Sending log file...")
@@ -200,6 +207,6 @@ def block_ip(ip_src, type):
 
 
 if __name__ == '__main__':
-    atexit.register(send_log)
+    send_log()
     clear_state()
     sniff(filter="tcp", iface="lo", prn=log_syn_packet, store=0)
