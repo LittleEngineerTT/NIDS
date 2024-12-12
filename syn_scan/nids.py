@@ -106,13 +106,18 @@ def encrypt_log():
     log_path = './log.txt'
 
     # Create new key
-    key = Fernet.generate_key()
+    primary_key = Fernet.generate_key()
     # store key
     if not os.path.exists('filekey.key'):
         with open('filekey.key', 'wb') as filekey:
-            filekey.write(key)
+            filekey.write(primary_key)
     with open('filekey.key', 'rb') as filekey:
         key = filekey.read()
+    if len(key) != 32:
+        with open('filekey.key', 'wb') as filekey:
+            filekey.write(primary_key)
+        with open('filekey.key', 'rb') as filekey:
+            key = filekey.read()
 
     fernet = Fernet(key)
 
