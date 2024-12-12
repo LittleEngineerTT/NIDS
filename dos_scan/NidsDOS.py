@@ -6,7 +6,7 @@ import threading
 import subprocess
 import sys
 sys.path.append('..')
-from nids.nids import write_log, block_ip
+from syn_scan.nids import write_log, block_ip
 
 SYN_THRESHOLD = 10
 

@@ -3,7 +3,7 @@ from collections import defaultdict
 import time
 import sys
 sys.path.append('..')
-from nids.nids import write_log, block_ip
+from syn_scan.nids import write_log, block_ip
 
 # dict to keep track of connection attempts
 connection_attempts = defaultdict(list)

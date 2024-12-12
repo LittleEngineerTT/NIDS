@@ -1,7 +1,7 @@
 from scapy.all import sniff, TCP
 from ssh_bruteforce import ssh_nids
-from dos_scan import NdisDOS
-from nids import nids
+from dos_scan import NidsDOS
+from syn_scan import nids
 
 def global_detect(packet):
     # we redirect packet to every sub-nids and they will treat it as they want
