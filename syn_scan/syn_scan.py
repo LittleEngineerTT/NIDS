@@ -67,16 +67,16 @@ if __name__ == "__main__":
             print("You should use a single port")
             show_help()
             sys.exit(1)
-        scan_port(target_ip, int(target_port[0]), src_ip="127.0.1.3")
+        scan_port(target_ip, int(target_port[0]), src_ip="127.0.2.3", timeout=0)
 
     elif scan_type == "several":
         for port in target_port:
-            scan_port(target_ip, int(port), 3, src_ip="127.0.1.2")
+            scan_port(target_ip, int(port), timeout=0, src_ip="127.0.2.2")
 
     elif scan_type == "same_network":
         ip_list = create_ip_list(len(target_port))
         for i in range(len(target_port)):
-            scan_port(target_ip, int(target_port[i]), 0, src_ip=ip_list[i])
+            scan_port(target_ip, int(target_port[i]), timeout=0, src_ip=ip_list[i])
     else:
         print("Error: Invalid scan type")
         show_help()
