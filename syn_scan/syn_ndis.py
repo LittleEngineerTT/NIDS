@@ -102,16 +102,6 @@ def get_ports(content_type, content):
         return ports
 
 
-def sign_message(message: str, private_key_hex: str) -> str:
-    try:
-        signing_key = SigningKey(bytes.fromhex(private_key_hex))
-        # Signing
-        signed = signing_key.sign(message.encode())
-        return base64.b64encode(signed).decode()
-    except Exception as e:
-        raise Exception(f"Erreur de signature: {str(e)}")
-
-
 def encrypt_log():
     log_path = './log.txt'
 
