@@ -7,8 +7,6 @@ from datetime import datetime
 import threading
 import ipaddress
 import atexit
-from nacl.signing import SigningKey
-import base64
 import smtplib
 from email.mime.text import MIMEText
 from cryptography.fernet import Fernet
