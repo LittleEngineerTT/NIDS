@@ -17,8 +17,13 @@ state = {}
 network_state = {}
 save_state = set()
 parser = argparse.ArgumentParser(description='NIDS')
-parser.add_argument( '--email', required=True, help='Email address to send the report')
-email = parser.parse_args().email
+parser.add_argument( '-s', '--source_email', required=True, help='Source email address to send the report')
+parser.add_argument('-p', '--password', required=True, help='App password (app password gmail)')
+parser.add_argument('-d', '--dest_email', required=True, help='Destination email address')
+dst_email = parser.parse_args().source_email
+src_mail = parser.parse_args().dest_email
+password = parser.parse_args().password
+
 
 def clear_state():
     global state, network_state
@@ -127,20 +132,18 @@ def encrypt_log():
 
 
 def send_log():
-    global email
+    global dst_email, src_mail, password
     encrypted_log = encrypt_log().decode("utf-8")
 
     print("Sending log file...")
 
-    GMAIL_USERNAME = "epitanidsprojecteventsummary"
-    GMAIL_APP_PASSWORD = "rvmjahmhwhjntdkr"
-    recipients = [email]
+    recipients = [dst_email]
     msg = MIMEText(encrypted_log)
     msg["Subject"] = "NIDS report"
     msg["To"] = ", ".join(recipients)
-    msg["From"] = f"{GMAIL_USERNAME}@gmail.com"
+    msg["From"] = src_mail
     smtp_server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
-    smtp_server.login(GMAIL_USERNAME, GMAIL_APP_PASSWORD)
+    smtp_server.login(src_mail, password)
     smtp_server.sendmail(msg["From"], recipients, msg.as_string())
     smtp_server.quit()
 
