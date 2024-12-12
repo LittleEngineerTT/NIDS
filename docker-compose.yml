@@ -10,5 +10,6 @@ services:
       - .env
     volumes:
       - ./logs:/app/logs
+      - ./filekey.key:/app/filekey.key
     restart: unless-stopped
     command: sudo python3 global_nids.py --source_email $src_email --password $password --dest_email $dst_email -i $interval
