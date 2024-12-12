@@ -30,5 +30,5 @@ def detect_bruteforce(packet):
 
 print(f"Started Anti SSH Bruteforce NIDS on TCP port {TARGET_PORT} for potential brute force attempts...")
 # we directly filter by port here!
-sniff(filter=f"tcp and dst port {TARGET_PORT}", prn=detect_bruteforce, store=0, iface="lo")
+#sniff(filter=f"tcp and dst port {TARGET_PORT}", prn=detect_bruteforce, store=0, iface="lo")
 
