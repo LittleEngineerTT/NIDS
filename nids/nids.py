@@ -58,7 +58,7 @@ def log_syn_packet(packet):
 
             to_log = to_block(src, network)
             if to_log >= 0:
-                block_ip(src, to_log)
+                #block_ip(src, to_log)
                 write_log(to_log, src, network, tcp_layer.dport, "SYN Scan")
 
 
@@ -206,7 +206,9 @@ def block_ip(ip_src, type):
             )
 
 
-if __name__ == '__main__':
-    send_log()
-    clear_state()
-    sniff(filter="tcp", iface="lo", prn=log_syn_packet, store=0)
+send_log()
+clear_state()
+#if __name__ == '__main__':
+    #send_log()
+    #clear_state()
+    #sniff(filter="tcp", iface="lo", prn=log_syn_packet, store=0)

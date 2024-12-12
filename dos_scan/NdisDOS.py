@@ -4,7 +4,9 @@ import time
 import os
 import threading
 import subprocess
-
+import sys
+sys.path.append('..')
+from nids.nids import write_log, block_ip
 
 SYN_THRESHOLD = 10
 
@@ -15,12 +17,6 @@ syn_counts = defaultdict(int)
 last_check_time = time.time()
 
 blocked_ips = set()
-
-def block_ip(ip):
-    if ip not in blocked_ips:
-        print(f"[ACTION] IP : {ip} was blocked with iptables.")
-        os.system(f"sudo iptables -A INPUT -s {ip} -j DROP")
-        os.system(f'echo "iptables -D INPUT -s {ip} -j DROP" | sudo at now + 1 minute')
 
 def detect_syn_flood(packet):
     global last_check_time
@@ -35,6 +31,8 @@ def detect_syn_flood(packet):
         syn_counts[ip_src] += 1
 
         if syn_counts[ip_src] > SYN_THRESHOLD:
-            #write_log(1, ip_src, None, "80", "DOS SCAN")
-            block_ip(ip_src)  # Bloquer l'IP
+            pass
+            write_log(1, ip_src, None, "80", "DOS SCAN")
+            #block_ip(ip_src)  # Bloquer l'IP
 
+print(f"Started Anti SYN Flood NIDS on TCP")
