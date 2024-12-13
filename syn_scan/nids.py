@@ -14,6 +14,8 @@ from cryptography.fernet import Fernet
 state = {}
 network_state = {}
 save_state = set()
+MAX_TRESHOLD = 3
+
 parser = argparse.ArgumentParser(description='NIDS')
 parser.add_argument( '-s', '--source_email', required=True, help='Source email address to send the report')
 parser.add_argument('-p', '--password', required=True, help='App password (app password gmail)')
@@ -56,26 +58,29 @@ def log_syn_packet(packet):
             state[src].add(tcp_layer.dport)
             network = get_network_from_ip(src)
 
-            to_log = to_block(src, network)
+            to_log = to_block(src, network, tcp_layer.dport)
             if to_log >= 0:
                 block_ip(src, to_log)
                 write_log(to_log, src, network, tcp_layer.dport, "SYN Scan")
 
 
-def to_block(src, network):
-    global state, network_state
+def to_block(src, network, port):
+    global state, network_state, MAX_TRESHOLD
 
     # Check for a network scan
     if network is not None:
         if network not in network_state.keys():
             network_state[network] = set()
+        ports = set()
+        for src_ip in network_state[network]:
+            ports.add(src_ip)
         network_state[network].add(src)
-        if len(network_state[network]) >= 3:
+        if len(ports) >= MAX_TRESHOLD:
             return 2
 
     # Check for a one ip scan
     if src in state.keys():
-        return 1 if len(state[src]) >= 3 else -1
+        return 1 if len(state[src]) >= MAX_TRESHOLD else -1
     else:
         return -1
 
