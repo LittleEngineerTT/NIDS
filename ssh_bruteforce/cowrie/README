@@ -1,2 +1,5 @@
-Commande à lancer pour le honeypot cowrie (à lancer à partir de ce dossier):
-docker run --name cowrie_docker -v $(pwd)/etc:/cowrie/cowrie-git/etc -d -p 2222:2222 cowrie/cowrie:latest
+Command to execute cowrie honeypot:
+`docker run --name cowrie_docker -v $(pwd)/etc:/cowrie/cowrie-git/etc -d -p 2222:2222 cowrie/cowrie:latest`
+
+Logs are in the following directory
+`tail -f /cowrie/cowrie-git/var/log/cowrie/cowrie.log`
