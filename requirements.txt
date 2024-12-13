@@ -1,2 +1,6 @@
 scapy
 cryptography
+requests==2.23.0
+pymsteams==0.1.13
+PyYAML==5.3.1
+validators==0.18.1
