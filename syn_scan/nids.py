@@ -58,7 +58,7 @@ def log_syn_packet(packet):
 
             to_log = to_block(src, network)
             if to_log >= 0:
-                #block_ip(src, to_log)
+                block_ip(src, to_log)
                 write_log(to_log, src, network, tcp_layer.dport, "SYN Scan")
 
 

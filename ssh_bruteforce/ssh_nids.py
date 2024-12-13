@@ -29,7 +29,7 @@ def detect_bruteforce(packet):
             write_log(1, src_ip, None, "2222", "SSH BRUTEFORCE")
             # clear the list to avoid repeated alerts
             connection_attempts[src_ip] = []
-            # block_ip(src_ip, 0)
+            block_ip(src_ip, 0)
 
 print(f"Started Anti SSH Bruteforce NIDS on TCP port {TARGET_PORT} for potential brute force attempts...")
 # we directly filter by port here!
