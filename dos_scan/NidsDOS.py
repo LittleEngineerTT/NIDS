@@ -31,8 +31,7 @@ def detect_syn_flood(packet):
         syn_counts[ip_src] += 1
 
         if syn_counts[ip_src] > SYN_THRESHOLD:
-            pass
             write_log(1, ip_src, None, "80", "DOS SCAN")
-            block_ip(ip_src)  # Bloquer l'IP
+            block_ip(ip_src, 0)  # Bloquer l'IP
 
 print(f"Started Anti SYN Flood NIDS on TCP")
