@@ -10,7 +10,7 @@ connection_attempts = defaultdict(list)
 
 MAX_ATTEMPTS = 10 * 2 # multiply by two because SSH initiate two request
 TIME_WINDOW = 60  # in seconds
-TARGET_PORT = 22
+TARGET_PORT = 2222
 
 def detect_bruteforce(packet):
     # check for TCP SYN packets to the target port
@@ -26,7 +26,7 @@ def detect_bruteforce(packet):
 
         # check if the number of attempts exceeds the threshold
         if len(connection_attempts[src_ip]) >= MAX_ATTEMPTS:
-            write_log(1, src_ip, None, "2222", "SSH BRUTEFORCE")
+            write_log(1, src_ip, None, TARGET_PORT, "SSH BRUTEFORCE")
             # clear the list to avoid repeated alerts
             connection_attempts[src_ip] = []
             block_ip(src_ip, 0)
