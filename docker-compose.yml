@@ -9,22 +9,10 @@ services:
     env_file:
       - .env
     volumes:
-      - ./logs:/app/logs
+      - ./ssh_bruteforce/cowrie/etc:/cowrie/cowrie-git/etc
+      - ./log.txt:/app/log.txt
       - ./filekey.key:/app/filekey.key
-    networks:
-      - honeypot_network
+    privileged: true
     restart: unless-stopped
     command: ./start.sh
 
-  cowrie:
-    image: cowrie/cowrie
-    ports:
-      - "2222:2222"
-    volumes:
-      - ./ssh_bruteforce/cowrie/etc:/cowrie/cowrie-git/etc
-    networks:
-      - honeypot_network
-
-networks:
-  honeypot_network:
-    driver: bridge
