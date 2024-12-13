@@ -12,6 +12,7 @@ services:
       - ./ssh_bruteforce/cowrie/etc:/cowrie/cowrie-git/etc
       - ./log.txt:/app/log.txt
       - ./filekey.key:/app/filekey.key
+      - ./dos_scan/artillerie/config:/var/artillery/config
     privileged: true
     restart: unless-stopped
     command: ./start.sh
