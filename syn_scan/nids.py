@@ -72,10 +72,12 @@ def to_block(src, network, port):
         if network not in network_state.keys():
             network_state[network] = set()
         ports = set()
+        ports.add(port)
         for src_ip in network_state[network]:
-            ports.add(src_ip)
+            for elem in state[src_ip]:
+                ports.add(elem)
         network_state[network].add(src)
-        if len(ports) >= MAX_TRESHOLD:
+        if len(ports) >= MAX_TRESHOLD and len(network_state[network]) >= 2:
             return 2
 
     # Check for a one ip scan
