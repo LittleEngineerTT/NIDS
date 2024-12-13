@@ -26,7 +26,7 @@ def detect_syn_flood(packet):
         syn_counts.clear()
         last_check_time = current_time
 
-    if packet.haslayer(TCP) and packet[TCP].flags == 'S':
+    if packet.haslayer(TCP) and packet[TCP].flags == 'S' and packet[TCP].dport == 80:
         ip_src = packet[IP].src
         syn_counts[ip_src] += 1
 
