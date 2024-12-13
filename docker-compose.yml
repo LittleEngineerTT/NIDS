@@ -5,7 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: ndis-container
+    container_name: nids-container
     env_file:
       - .env
     volumes:
