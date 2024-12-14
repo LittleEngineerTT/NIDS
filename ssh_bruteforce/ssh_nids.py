@@ -1,6 +1,9 @@
 from scapy.all import sniff, TCP
 from collections import defaultdict
 import time
+import sys
+sys.path.append('..')
+from syn_scan.nids import write_log, block_ip
 
 # dict to keep track of connection attempts
 connection_attempts = defaultdict(list)
@@ -23,10 +26,10 @@ def detect_bruteforce(packet):
 
         # check if the number of attempts exceeds the threshold
         if len(connection_attempts[src_ip]) >= MAX_ATTEMPTS:
-            # write_log(1, src_ip, None, "2222", "SSH BRUTEFORCE")
+            write_log(1, src_ip, None, TARGET_PORT, "SSH BRUTEFORCE")
             # clear the list to avoid repeated alerts
             connection_attempts[src_ip] = []
-            # block_ip(src_ip, 0)
+            block_ip(src_ip, 0)
 
 print(f"Started Anti SSH Bruteforce NIDS on TCP port {TARGET_PORT} for potential brute force attempts...")
 # we directly filter by port here!
