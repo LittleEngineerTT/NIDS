@@ -11,5 +11,5 @@ def global_detect(packet):
 
 print(f"Started Global NIDS Protection System...")
 # we directly filter by port here!
-sniff(filter=f"tcp", prn=global_detect, store=0, iface="lo")
+sniff(filter=f"tcp", prn=global_detect, store=0, iface=["lo", "eth0"])
 
