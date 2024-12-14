@@ -5,4 +5,4 @@ cd dos_scan/artillery/
 sudo python3 setup.py -y
 sudo python3 artillery.py -y &
 cd ../../
-sudo python3 global_nids.py --source_email $src_email --password $password --dest_email $dst_email -i $interval
+sudo python3 global_nids.py --source_email $src_email --password $password --dest_email $dst_email -i $interval -c $public_cert_path

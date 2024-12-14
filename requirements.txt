@@ -5,3 +5,4 @@ pymsteams==0.1.13
 PyYAML==5.3.1
 validators==0.18.1
 paramiko==2.9.3
+python-gnupg==0.5.3
