@@ -14,6 +14,7 @@ state = {}
 network_state = {}
 save_state = set()
 MAX_TRESHOLD = 3
+blocked_ips = set()
 
 parser = argparse.ArgumentParser(description='NIDS')
 parser.add_argument( '-s', '--source_email', required=True, help='Source email address to send the report')
@@ -59,8 +60,8 @@ def log_syn_packet(packet):
 
             to_log = to_block(src, network, tcp_layer.dport)
             if to_log >= 0:
-                block_ip(src, to_log)
                 write_log(to_log, src, network, tcp_layer.dport, "SYN Scan")
+                block_ip(src, to_log)
 
 
 def to_block(src, network, port):
@@ -90,9 +91,14 @@ def write_log(to_log, src, network, target, log_type):
     timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     with open("log.txt", "a") as log_file:
         if to_log == 1:
+            # Avoid multiple log
+            if src in save_state:
+                return
             log_file.write(f"{timestamp} {log_type}: {src} -> {target}\n")
             print(f"{timestamp} {log_type}: {src} -> {target}")
         elif to_log == 2:
+            if network in save_state:
+                return
             log_file.write(f"{timestamp} {log_type}: {network} -> {target}\n")
             print(f"{timestamp} {log_type}: {network} -> {target}")
 
