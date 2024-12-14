@@ -160,6 +160,7 @@ def block_ip(ip_src, type):
     if type == 2:
         network = '.'.join(ip_src.split('.')[:-1]) + ".0/24"
         if network not in save_state:
+            write_log(1, network, network, network, "Blocking")
             save_state.add(network)
             print(f"Blocking {'.'.join(ip_src.split('.')[:-1])}.0/24...")
             for i in range(1,255):
@@ -190,6 +191,7 @@ def block_ip(ip_src, type):
                 )
     else:
         if ip_src not in save_state:
+            write_log(1, ip_src, ip_src, ip_src, "Blocking")
             save_state.add(ip_src)
             print(f"Blocking {ip_src}...")
             subprocess.run(
