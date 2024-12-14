@@ -1,27 +1,30 @@
 import argparse
 import subprocess
 import os
+from send_mail import send_encrypted_email
 
-from scapy.all import sniff
 from scapy.layers.inet import IP, TCP
 from datetime import datetime
 import threading
 import ipaddress
-import smtplib
-from email.mime.text import MIMEText
-from cryptography.fernet import Fernet
+
 
 state = {}
 network_state = {}
 save_state = set()
+MAX_TRESHOLD = 3
+blocked_ips = set()
+
 parser = argparse.ArgumentParser(description='NIDS')
 parser.add_argument( '-s', '--source_email', required=True, help='Source email address to send the report')
 parser.add_argument('-p', '--password', required=True, help='App password (app password gmail)')
 parser.add_argument('-d', '--dest_email', required=True, help='Destination email address')
+parser.add_argument('-c', '--cert_path', required=True, help='Certification path')
 parser.add_argument('-i', '--interval', required=True, help='Time interval to send NIDS report')
 dst_email = parser.parse_args().source_email
 src_mail = parser.parse_args().dest_email
 password = parser.parse_args().password
+cert_path = parser.parse_args().cert_path
 interval = parser.parse_args().interval
 
 
@@ -56,26 +59,31 @@ def log_syn_packet(packet):
             state[src].add(tcp_layer.dport)
             network = get_network_from_ip(src)
 
-            to_log = to_block(src, network)
+            to_log = to_block(src, network, tcp_layer.dport)
             if to_log >= 0:
-                #block_ip(src, to_log)
                 write_log(to_log, src, network, tcp_layer.dport, "SYN Scan")
+                block_ip(src, to_log)
 
 
-def to_block(src, network):
-    global state, network_state
+def to_block(src, network, port):
+    global state, network_state, MAX_TRESHOLD
 
     # Check for a network scan
     if network is not None:
         if network not in network_state.keys():
             network_state[network] = set()
+        ports = set()
+        ports.add(port)
+        for src_ip in network_state[network]:
+            for elem in state[src_ip]:
+                ports.add(elem)
         network_state[network].add(src)
-        if len(network_state[network]) >= 3:
+        if len(ports) >= MAX_TRESHOLD and len(network_state[network]) >= 3:
             return 2
 
     # Check for a one ip scan
     if src in state.keys():
-        return 1 if len(state[src]) >= 3 else -1
+        return 1 if len(state[src]) >= MAX_TRESHOLD else -1
     else:
         return -1
 
@@ -84,9 +92,14 @@ def write_log(to_log, src, network, target, log_type):
     timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     with open("log.txt", "a") as log_file:
         if to_log == 1:
+            # Avoid multiple log
+            if src in save_state:
+                return
             log_file.write(f"{timestamp} {log_type}: {src} -> {target}\n")
             print(f"{timestamp} {log_type}: {src} -> {target}")
         elif to_log == 2:
+            if network in save_state:
+                return
             log_file.write(f"{timestamp} {log_type}: {network} -> {target}\n")
             print(f"{timestamp} {log_type}: {network} -> {target}")
 
@@ -102,45 +115,28 @@ def get_ports(content_type, content):
         return ports
 
 
-def encrypt_log():
+def send_log():
+    global dst_email, src_mail, password, interval, cert_path
     log_path = './log.txt'
 
-    # Create new key
-    key = Fernet.generate_key()
-    # store key
-    with open('filekey.key', 'wb') as filekey:
-        filekey.write(key)
-    with open('filekey.key', 'rb') as filekey:
-        key = filekey.read()
-
-    fernet = Fernet(key)
+    threading.Timer(int(10), send_log).start()
+    if not os.path.exists("log.txt"):
+        return
+    if not os.path.exists(cert_path):
+        print("Cert path not found")
+        return
 
     with open(log_path, 'rb') as file:
         log_data = file.read()
-    encrypted = fernet.encrypt(log_data)
-    return encrypted
 
-
-def send_log():
-    global dst_email, src_mail, password, interval
-
-    threading.Timer(int(interval), send_log).start()
-    if not os.path.exists("log.txt"):
-        return
-
-    encrypted_log = encrypt_log().decode("utf-8")
-
-    print("Sending log file...")
-
-    recipients = [dst_email]
-    msg = MIMEText(encrypted_log)
-    msg["Subject"] = "NIDS report"
-    msg["To"] = ", ".join(recipients)
-    msg["From"] = src_mail
-    smtp_server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
-    smtp_server.login(src_mail, password)
-    smtp_server.sendmail(msg["From"], recipients, msg.as_string())
-    smtp_server.quit()
+    send_encrypted_email(
+        asc_cert_path=cert_path,
+        recipient_email=dst_email,
+        sender_email=src_mail,
+        smtp_password=password,
+        subject='NIDS Report',
+        message=log_data,
+    )
 
 
 def block_ip(ip_src, type):
@@ -148,6 +144,7 @@ def block_ip(ip_src, type):
     if type == 2:
         network = '.'.join(ip_src.split('.')[:-1]) + ".0/24"
         if network not in save_state:
+            write_log(1, network, network, network, "Blocking")
             save_state.add(network)
             print(f"Blocking {'.'.join(ip_src.split('.')[:-1])}.0/24...")
             for i in range(1,255):
@@ -178,6 +175,7 @@ def block_ip(ip_src, type):
                 )
     else:
         if ip_src not in save_state:
+            write_log(1, ip_src, ip_src, ip_src, "Blocking")
             save_state.add(ip_src)
             print(f"Blocking {ip_src}...")
             subprocess.run(

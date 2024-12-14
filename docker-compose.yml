@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  python-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nids-container
+    env_file:
+      - .env
+    volumes:
+      - ./ssh_bruteforce/cowrie/etc:/cowrie/cowrie-git/etc
+      - ./log.txt:/app/log.txt
+      - ./filekey.key:/app/filekey.key
+      - ./dos_scan/artillery/config:/var/artillery/config
+    privileged: true
+    ports:
+      - "2222:2222"
+      - "8001:80"
+    restart: unless-stopped
+    command: ./start.sh
+

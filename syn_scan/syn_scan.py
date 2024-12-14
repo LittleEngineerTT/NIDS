@@ -36,9 +36,10 @@ def show_help():
     print("ARGUMENTS:\n"
           "\tscan_type:\n" +
           "\t\tsimple: scan to a single port\n" +
-          "\t\tseveral: scan to multiple ports using 3 seconds as delay\n"
+          "\t\tseveral: scan to multiple ports using 3 seconds as delay\n",
+          "\t\tsame_network: to multiple ports using multiple ip source\n"
           )
-    print("\tports: list of ports to scan. Examples 1,2-10,11 OR 22")
+    print("\tports:\n\t\tlist of ports to scan. Examples 1,2-10,11 OR 22")
 
 if __name__ == "__main__":
 
