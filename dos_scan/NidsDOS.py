@@ -1,9 +1,6 @@
-from scapy.all import sniff, IP, TCP
+from scapy.all import IP, TCP
 from collections import defaultdict
 import time
-import os
-import threading
-import subprocess
 import sys
 sys.path.append('..')
 from syn_scan.nids import write_log, block_ip
