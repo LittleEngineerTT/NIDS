@@ -2,7 +2,6 @@ import argparse
 import subprocess
 import os
 
-from scapy.all import sniff
 from scapy.layers.inet import IP, TCP
 from datetime import datetime
 import threading
@@ -77,7 +76,7 @@ def to_block(src, network, port):
             for elem in state[src_ip]:
                 ports.add(elem)
         network_state[network].add(src)
-        if len(ports) >= MAX_TRESHOLD and len(network_state[network]) >= 2:
+        if len(ports) >= MAX_TRESHOLD and len(network_state[network]) >= 3:
             return 2
 
     # Check for a one ip scan
