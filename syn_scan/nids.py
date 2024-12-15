@@ -118,8 +118,7 @@ def get_ports(content_type, content):
 def send_log():
     global dst_email, src_mail, password, interval, cert_path
     log_path = './log.txt'
-
-    threading.Timer(interval, send_log).start()
+    threading.Timer(int(interval), send_log).start()
     if not os.path.exists("log.txt"):
         return
     if not os.path.exists(cert_path):
